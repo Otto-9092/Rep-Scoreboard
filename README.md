@@ -1,78 +1,82 @@
-# CEA Competition Scorecard
+[README.md](https://github.com/user-attachments/files/32024930/README.md)
+# CEA Championship Scoreboard
 
-An interactive web scoreboard for tracking Customer Experience Agency (CEA) competition metrics across the Region 530 sales district. Hosted on GitHub Pages.
+Interactive Pioneer-branded scoreboard for the Region 530 CEA Championship. Hosted on GitHub Pages. Fantasy-football-style standings, podium, weekly updates, and a Rules tab. Data lives in CSV files you edit right in the GitHub web interface.
 
-**Live site:** `https://YOUR-USERNAME.github.io/cea-scoreboard/` *(update after enabling Pages)*
-
----
-
-## What this is
-
-A single-page web app that reads three files from the `data/` folder and renders a leaderboard, per-agency detail view, and rules page. Reps can view it on any phone or laptop. You update it by editing CSV files directly in the GitHub web interface — no code changes required.
-
-- **9 agencies** tracked: CW Seed, Fitts Seeds, Heiting Seed, JK Dean Ag, Keith Paul, Marker Ag, Meyer Seeds, MK Seeds, Soule Seed Company
-- **20 scoring categories** totalling **530 points**
-- **Two views:** ranked leaderboard (with expandable per-agency detail) and a full details grid
-- **Rules & Definitions tab** auto-populated from `data/categories.csv`
-- **Colour coding:** 0–50% red · 51–75% yellow · 76–100% green
-- **"Available So Far" mode** ranks agencies only against categories whose deadline has passed
-- **Print view** for meetings
+**Live site:** `https://YOUR-USERNAME.github.io/cea-scoreboard/`
 
 ---
 
-## Setup — one-time (10 minutes)
+## What's inside
 
-1. **Create a new public GitHub repo** named `cea-scoreboard` (or anything you like — just update the link in `index.html` footer and `README.md` accordingly).
-2. **Upload this folder's contents** to the repo root (drag-and-drop in the GitHub web UI works).
-3. **Enable GitHub Pages:**
-   - Repo → **Settings** → **Pages**
-   - Source: **Deploy from a branch**
-   - Branch: **main** · Folder: **/ (root)** · Save.
-4. Wait ~1 minute. Your site is live at `https://YOUR-USERNAME.github.io/cea-scoreboard/`.
-5. Share the URL with your team.
+- **Standings tab** — Top-of-standings podium (gold/silver/bronze), Next Up event card, On the Clock (deadlines in next 30 days), This Week update banner, full ranked table with expandable per-agency detail.
+- **Team Stats tab** — Full agency × category grid with color coding, filterable by category group.
+- **Schedule tab** — All season events with day countdowns, past events greyed out, next event highlighted.
+- **Rules & Definitions tab** — Every category's rules, max points, deadline, and description. Auto-populated from `data/categories.csv`.
+- **Header season progress bar** — Shows how far through the 2026-2027 season we are.
+- **% toggle** — Total (530 pts) vs. Available So Far (only categories past their deadline).
+- **Print view.**
+- **Mobile-friendly.**
+- **Clear error messages** — if a data file is missing or misnamed, the page tells you exactly which file failed instead of hanging on "Loading...".
+
+---
+
+## One-time setup (10 minutes)
+
+1. **Create a new public GitHub repo** named `cea-scoreboard` (or whatever you like).
+2. **Upload this folder's contents** to the repo root. In the GitHub web UI: "Add file" -> "Upload files" -> drag the entire contents in.
+3. **Enable Pages:** Settings -> Pages -> Source: "Deploy from a branch" -> Branch `main`, folder `/ (root)` -> Save. Wait ~1 minute.
+4. **Update the repo URL** in `data/config.json` (the `repo_url` field) so the "Edit on GitHub" footer link works.
+5. **(Optional) drop in the Pioneer logo** as `assets/pioneer-logo.png`. The page will use it automatically. Until then, a text-based "PIONEER" wordmark is shown.
+
+Your site is live at `https://YOUR-USERNAME.github.io/cea-scoreboard/`.
 
 ---
 
 ## How to update
 
-Everything lives in three files under `data/`. Edit them in the GitHub web UI (pencil icon → make change → commit).
+Everything lives in the `data/` folder. Edit in the GitHub web UI (pencil icon -> make change -> commit).
 
-### Update scores → `data/scores.csv`
+### Update scores -> `data/scores.csv`
 
-One row per agency. Each column is a category ID (matches `categories.csv`). Enter the agency's earned points as a number. Leave blank if not yet scored.
+One row per agency. Each column is a category ID that matches `categories.csv`. Enter earned points as a number. Leave blank for "not yet scored".
 
-Example:
-```
-agency,pk_session,harvest_data,dp_meeting,...
-CW Seed,5,12,30,...
-```
+### Add / rename / edit categories -> `data/categories.csv`
 
-### Add / rename / edit categories → `data/categories.csv`
+Columns: `id`, `name`, `short_name`, `max_points`, `group`, `deadline` (YYYY-MM-DD), `description`.
 
-Each row = one category. Columns:
+**To add a new category:** add a row to `categories.csv` with a new `id`, then add a matching column to `scores.csv`. Commit both files in the same commit.
 
-| Column | What it is |
-| --- | --- |
-| `id` | Short internal ID (no spaces, lowercase). Must match the column in `scores.csv`. |
-| `name` | Full category name shown on the Rules tab. |
-| `short_name` | Shorter label used in tight table cells. |
-| `max_points` | Number, the maximum points possible. |
-| `group` | One of the 5 groups from `config.json` (Training & PK, Planning & Admin, Customer Engagement, Data & Reporting, Rep Recognition). |
-| `deadline` | ISO date `YYYY-MM-DD`. Used for "Available So Far" mode. |
-| `description` | Longer description shown on the Rules tab. Wrap in double quotes if it contains commas. |
+**To rename a category:** change `name` / `short_name` / `description`. Do NOT change `id` unless you also rename the column in `scores.csv`.
 
-**To add a new category:**
-1. Add a row to `categories.csv` with a new `id`.
-2. Add a column with that same `id` to `scores.csv`.
-3. Commit. The scoreboard picks it up on next load.
+**To rename a PK Session placeholder:** find `pk_session_fall` or `pk_session_winter` in `categories.csv` and update `name`, `short_name`, `deadline`, and `description` with the real session details. Keep the `id` alone.
 
-**To rename a category:** just change `name` / `short_name` / `description` — do NOT change `id` unless you also update `scores.csv`.
+### Add events / next-event card -> `data/events.csv`
 
-### Change colors, groups, footnotes → `data/config.json`
+Columns: `date` (YYYY-MM-DD), `title`, `description`, `category` (optional, category ID), `link` (optional URL). The soonest upcoming event automatically becomes the "Next Up" card on the Standings tab. All events appear on the Schedule tab.
 
-- `color_thresholds` — red / yellow cutoffs (%)
-- `category_groups` — the order groups appear (edit here to reorder or rename groups; make sure `categories.csv` rows use the same spelling)
-- `footnotes` — key/value pairs shown on the Rules tab
+### Weekly update banner -> `data/updates.csv`
+
+Columns: `date` (YYYY-MM-DD), `headline`, `body`. Add a new row each week. The most recent one appears at the top of the Standings tab as a "This Week" banner.
+
+### Colors, groups, footnotes -> `data/config.json`
+
+- `title`, `subtitle`, `season_start`, `season_end` — self-explanatory
+- `color_thresholds` — red / yellow cutoffs (%). Currently 50 / 75.
+- `category_groups` — the order groups appear. Edit here to reorder or rename groups; make sure `categories.csv` rows use the same spelling.
+- `footnotes` — key/value pairs shown at the bottom of the Rules tab.
+- `repo_url` — the "Edit on GitHub" footer link.
+
+---
+
+## Weekly update workflow (suggested)
+
+Every Friday (or whenever):
+
+1. Update `data/scores.csv` with the week's new points.
+2. Add a new row to `data/updates.csv` with the week's headline + recap.
+3. (Optional) add any new events to `data/events.csv`.
+4. Commit. Site updates within ~30 seconds.
 
 ---
 
@@ -80,46 +84,47 @@ Each row = one category. Columns:
 
 ```
 cea-scoreboard/
-├── index.html              # Main page
-├── README.md               # This file
-├── LICENSE                 # MIT License
-├── .gitignore
-├── assets/
-│   ├── styles.css          # All styles
-│   └── app.js              # All logic (vanilla JS, no build step)
-├── data/
-│   ├── config.json         # Colors, groups, title, footnotes
-│   ├── categories.csv      # Categories + max points + descriptions
-│   └── scores.csv          # Agency scores (edit this most often)
-└── .github/
-    └── workflows/
-        └── pages.yml       # Optional: auto-deploy on push (usually not needed with Pages default)
++-- index.html
++-- README.md
++-- LICENSE                    (MIT)
++-- .gitignore
++-- assets/
+|   +-- styles.css             Pioneer green/amber styling
+|   +-- app.js                 All logic (vanilla JS, no build step)
+|   +-- pioneer-logo.png       (Optional -- add your own)
++-- data/
+|   +-- config.json            Colors, groups, title, footnotes
+|   +-- categories.csv         Categories + max points + descriptions
+|   +-- scores.csv             Agency scores (edit most often)
+|   +-- events.csv             Upcoming events (Next Up card + Schedule tab)
+|   +-- updates.csv            Weekly recap notes (This Week banner)
++-- .github/workflows/
+    +-- pages.yml              Optional GitHub Actions deploy (usually not needed)
 ```
 
 ---
 
 ## Known items to review
 
-- **Two extra "PK Session" columns** (`pk_session_extra1`, `pk_session_extra2`) are placeholders kept from the source spreadsheet. Rename in `categories.csv` once their real purpose is confirmed.
-- **Owner's Manual max points**: source spreadsheet header says "Max of 50 points" but the totals row shows 100. Set to **100** here — flip to 50 in `categories.csv` if that's wrong.
-- **Deadlines**: many categories didn't have hard deadlines in the source. Reasonable defaults are used — adjust in `categories.csv` as needed.
-- **Category descriptions**: draft text is pulled from the source spreadsheet where possible. Some categories need a fuller definition — edit `description` fields in `categories.csv` when you have time.
-- **Repo URL in footer**: `index.html` and this README reference `YOUR-USERNAME` — search-replace with your actual GitHub username after uploading.
+- **PK Session placeholders** (`pk_session_fall`, `pk_session_winter`) are ready to be renamed when you schedule those sessions.
+- **Owner's Manual max points** — set to 100 (matches the totals row in the source). Change to 50 in `categories.csv` if the "Max of 50" text in the source was correct.
+- **Rules descriptions** — draft text pulled from the source spreadsheet where possible; some are thin. Edit `description` fields in `categories.csv` when you want to flesh them out (Rep Reward Qualifier specifically could use more detail).
+- **Pioneer logo** — text wordmark shown until you drop `assets/pioneer-logo.png` in.
+- **Repo URL** — change `data/config.json` -> `repo_url` and the footer link works.
 
 ---
 
 ## Tech notes
 
-- Vanilla HTML/CSS/JS. No framework, no build step, no dependencies.
-- CSV parsing done inline (handles quoted fields and commas inside quotes).
-- Works offline once loaded (though GitHub Pages CDN is very fast).
-- Mobile-friendly.
-- Print-friendly (hit the "Print View" button on the Leaderboard tab).
+- Vanilla HTML/CSS/JS. No build step, no framework, no dependencies (except Google Fonts for Barlow Condensed / Inter).
+- CSV parsing done inline; handles quoted fields and commas inside quotes.
+- Works on any modern browser, mobile-friendly, print-friendly.
+- If data fails to load, the loading curtain shows exactly which file is at fault -- no silent "Loading..." hangs.
 
 ---
 
 ## License
 
-MIT — see `LICENSE`.
+MIT -- see `LICENSE`.
 
 Built for Region 530 by Mike Otto, Pioneer Territory Manager.
