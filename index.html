@@ -3,81 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CEA Competition Scorecard</title>
+<title>CEA Championship</title>
 <link rel="stylesheet" href="assets/styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-<header>
+<div id="loading-curtain">
+  <div class="curtain-inner">
+    <div class="pioneer-logo-loading">PIONEER<span class="leaf">&#10047;</span></div>
+    <p id="curtain-msg">Loading Season Standings&hellip;</p>
+    <p id="curtain-detail" class="curtain-detail"></p>
+  </div>
+</div>
+<header class="pioneer-header">
   <div class="header-inner">
-    <h1 id="site-title">CEA Competition Scorecard</h1>
-    <p id="site-subtitle" class="subtitle">Loading&hellip;</p>
+    <div class="brand">
+      <div class="pioneer-logo">
+        <img src="assets/pioneer-logo.png" alt="Pioneer" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+        <span class="pioneer-wordmark" style="display:none;">PIONEER<span class="leaf">&#10047;</span></span>
+      </div>
+    </div>
+    <div class="title-block">
+      <div class="kicker">Region 530 &middot; 2026&ndash;2027 Season</div>
+      <h1 id="site-title">CEA CHAMPIONSHIP</h1>
+    </div>
+    <div class="season-progress">
+      <div class="progress-label">SEASON PROGRESS</div>
+      <div class="progress-bar-outer"><div class="progress-bar-inner" id="season-progress-bar"></div></div>
+      <div class="progress-detail" id="season-progress-detail">&mdash;</div>
+    </div>
   </div>
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="leaderboard">Leaderboard</button>
-    <button class="tab-btn" data-tab="details">Details</button>
-    <button class="tab-btn" data-tab="rules">Rules &amp; Definitions</button>
+    <div class="tabs-inner">
+      <button class="tab-btn active" data-tab="standings">Standings</button>
+      <button class="tab-btn" data-tab="stats">Team Stats</button>
+      <button class="tab-btn" data-tab="schedule">Schedule</button>
+      <button class="tab-btn" data-tab="rules">Rules &amp; Definitions</button>
+    </div>
   </nav>
 </header>
 <main>
-  <section id="leaderboard" class="tab-panel active">
-    <div class="controls">
-      <label class="pct-toggle">
-        <span>Show % against:</span>
-        <select id="pct-basis">
-          <option value="total">Total Available (530)</option>
-          <option value="so_far" selected>Available So Far</option>
-        </select>
-      </label>
-      <button id="print-btn" class="btn-secondary">Print View</button>
+  <section id="standings" class="tab-panel active">
+    <div id="update-banner" class="update-banner" style="display:none;">
+      <div class="update-tag">THIS WEEK</div>
+      <div class="update-body">
+        <h3 id="update-headline"></h3>
+        <p id="update-text"></p>
+        <div class="update-date" id="update-date"></div>
+      </div>
+    </div>
+    <div class="podium-wrap">
+      <div class="podium-title">TOP OF THE STANDINGS</div>
+      <div id="podium" class="podium"></div>
+    </div>
+    <div class="hero-row">
+      <div class="hero-card next-event" id="next-event-card">
+        <div class="hero-tag">NEXT UP</div>
+        <div class="hero-content">
+          <div class="hero-date" id="next-event-date">&mdash;</div>
+          <h3 id="next-event-title">Loading next event&hellip;</h3>
+          <p id="next-event-desc"></p>
+        </div>
+      </div>
+      <div class="hero-card on-the-clock">
+        <div class="hero-tag amber">ON THE CLOCK</div>
+        <div class="hero-content">
+          <p class="hero-sub">Deadlines in the next 30 days</p>
+          <ul id="clock-list" class="clock-list"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="section-header">
+      <h2>THE STANDINGS</h2>
+      <div class="controls">
+        <label class="pct-toggle">
+          <span>% against:</span>
+          <select id="pct-basis">
+            <option value="total">Total (530 pts)</option>
+            <option value="so_far" selected>Available So Far</option>
+          </select>
+        </label>
+        <button id="print-btn" class="btn-secondary">Print</button>
+      </div>
     </div>
     <div class="table-wrap">
       <table id="leaderboard-table">
         <thead>
-          <tr>
-            <th class="col-rank">Rank</th>
-            <th class="col-agency">Agency</th>
-            <th class="col-total">Points</th>
-            <th class="col-pct">%</th>
-            <th class="col-bar"></th>
-          </tr>
+          <tr><th class="col-rank">#</th><th class="col-agency">Agency</th><th class="col-total">Points</th><th class="col-pct">%</th><th class="col-bar"></th></tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-    <p class="hint">Tap or click a row to see per-category detail.</p>
+    <p class="hint">Tap or click any row to see the agency's category breakdown.</p>
   </section>
-  <section id="details" class="tab-panel">
-    <div class="controls">
-      <label>
-        <span>Filter by group:</span>
-        <select id="group-filter"><option value="">All groups</option></select>
-      </label>
+  <section id="stats" class="tab-panel">
+    <div class="section-header">
+      <h2>TEAM STATS</h2>
+      <div class="controls">
+        <label><span>Filter by group:</span><select id="group-filter"><option value="">All groups</option></select></label>
+      </div>
     </div>
     <div class="table-wrap details-wrap">
-      <table id="details-table">
-        <thead></thead>
-        <tbody></tbody>
-      </table>
+      <table id="details-table"><thead></thead><tbody></tbody></table>
     </div>
   </section>
+  <section id="schedule" class="tab-panel">
+    <div class="section-header"><h2>SEASON SCHEDULE</h2></div>
+    <p class="hint">All key dates for the 2026&ndash;2027 CEA season. Past events greyed out.</p>
+    <div id="schedule-list" class="schedule-list"></div>
+  </section>
   <section id="rules" class="tab-panel">
-    <h2>Category Rules &amp; Definitions</h2>
-    <p class="hint">Definitions come from <code>data/categories.csv</code>. Edit that file in GitHub to change wording, add categories, or fix descriptions.</p>
+    <div class="section-header"><h2>RULES &amp; DEFINITIONS</h2></div>
+    <p class="hint">Category definitions come from <code>data/categories.csv</code>. Edit that file in GitHub to change wording, add categories, or fix descriptions.</p>
     <div id="rules-content"></div>
-    <h2>Footnotes</h2>
+    <h2 class="section-sub">FOOTNOTES</h2>
     <div id="footnotes-content"></div>
-    <h2>How Scoring Works</h2>
-    <ul>
-      <li><strong>Total points available:</strong> <span id="total-available"></span></li>
+    <h2 class="section-sub">HOW SCORING WORKS</h2>
+    <ul class="scoring-notes">
+      <li><strong>Total points available:</strong> <span id="total-available"></span> across <span id="total-cats"></span> categories.</li>
       <li><strong>Total agencies:</strong> <span id="total-agencies"></span></li>
       <li><strong>Color thresholds:</strong> <span class="chip red">0&ndash;50%</span> <span class="chip yellow">51&ndash;75%</span> <span class="chip green">76&ndash;100%</span></li>
-      <li><strong>"Available So Far"</strong> counts only categories whose deadline has passed as of today. Categories still open are excluded from both the earned and possible sides of the calculation.</li>
-      <li><strong>Ties:</strong> tied agencies share the same rank number; the next agency skips ahead (standard "1224" ranking).</li>
+      <li><strong>"Available So Far"</strong> counts only categories whose deadline has passed as of today. Categories still open are excluded from both the earned and possible sides of the calculation, so early-season rankings aren't misleading.</li>
+      <li><strong>Ties:</strong> tied agencies share the same rank number; the next agency skips ahead (standard "1224" ranking). No automatic tiebreaker &mdash; handled offline.</li>
     </ul>
   </section>
 </main>
 <footer>
-  <p>Region 530 &middot; Data last loaded <span id="load-time"></span> &middot; <a href="https://github.com/Otto-1992/Rep-Scoreboard" target="_blank" rel="noopener">Edit on GitHub</a></p>
+  <p><strong>REGION 530 CEA CHAMPIONSHIP</strong> &middot; 2026&ndash;2027 Season</p>
+  <p>Data last loaded <span id="load-time"></span> &middot; <a id="repo-link" href="#" target="_blank" rel="noopener">Edit on GitHub</a></p>
 </footer>
 <script src="assets/app.js"></script>
 </body>
