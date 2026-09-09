@@ -1,0 +1,335 @@
+// CEA Championship Scoreboard
+const FILES = {
+  config: 'data/config.json',
+  categories: 'data/categories.csv',
+  scores: 'data/scores.csv',
+  events: 'data/events.csv',
+  updates: 'data/updates.csv',
+};
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', inQuotes = false, i = 0;
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  while (i < text.length) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') { if (text[i+1] === '"') { field += '"'; i += 2; continue; } inQuotes = false; i++; continue; }
+      field += c; i++; continue;
+    } else {
+      if (c === '"') { inQuotes = true; i++; continue; }
+      if (c === ',') { row.push(field); field = ''; i++; continue; }
+      if (c === '\r') { i++; continue; }
+      if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; i++; continue; }
+      field += c; i++; continue;
+    }
+  }
+  if (field.length > 0 || row.length > 0) { row.push(field); rows.push(row); }
+  while (rows.length && rows[rows.length-1].every(x => x === '')) rows.pop();
+  return rows;
+}
+function csvToObjects(text) {
+  const rows = parseCSV(text);
+  if (rows.length === 0) return [];
+  const headers = rows[0];
+  return rows.slice(1).map(r => { const o = {}; headers.forEach((h,i) => o[h] = r[i] !== undefined ? r[i] : ''); return o; });
+}
+function colorClass(pct, t) {
+  if (pct === null || pct === undefined || isNaN(pct)) return 'pending';
+  if (pct <= t.red_max) return 'red';
+  if (pct <= t.yellow_max) return 'yellow';
+  return 'green';
+}
+function todayISO() { return new Date().toISOString().slice(0,10); }
+function fmtDate(iso) { if (!iso) return ''; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; }
+function fmtDateShort(iso) { if (!iso) return {day:'',month:'',year:''}; const d = new Date(iso + 'T12:00:00'); return { day: d.getDate(), month: d.toLocaleString('en-US',{month:'short'}), year: d.getFullYear() }; }
+function daysBetween(a, b) { const d1 = new Date(a + 'T00:00:00'); const d2 = new Date(b + 'T00:00:00'); return Math.round((d2 - d1) / 86400000); }
+function deadlinePassed(iso) { return iso ? iso <= todayISO() : false; }
+function escapeHtml(s) { if (s === null || s === undefined) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+let CONFIG, CATEGORIES, SCORES, EVENTS = [], UPDATES = [];
+
+async function fetchRequired(url) {
+  let res;
+  try { res = await fetch(url); } catch (e) { throw new Error(`Network error fetching ${url}: ${e.message}`); }
+  if (!res.ok) throw new Error(`Could not load ${url} (HTTP ${res.status}). Check the file exists at that path.`);
+  return res;
+}
+async function fetchOptional(url) { try { const r = await fetch(url); return r.ok ? await r.text() : null; } catch { return null; } }
+
+async function loadAll() {
+  const curtain = document.getElementById('loading-curtain');
+  const msg = document.getElementById('curtain-msg');
+  const detail = document.getElementById('curtain-detail');
+  try {
+    msg.textContent = 'Loading config...';
+    CONFIG = await (await fetchRequired(FILES.config)).json();
+    msg.textContent = 'Loading categories...';
+    CATEGORIES = csvToObjects(await (await fetchRequired(FILES.categories)).text()).map(c => ({...c, max_points: parseFloat(c.max_points) || 0}));
+    if (!CATEGORIES.length) throw new Error(`${FILES.categories} loaded but has no rows.`);
+    msg.textContent = 'Loading scores...';
+    SCORES = csvToObjects(await (await fetchRequired(FILES.scores)).text());
+    if (!SCORES.length) throw new Error(`${FILES.scores} loaded but has no rows.`);
+    const evText = await fetchOptional(FILES.events);
+    EVENTS = evText ? csvToObjects(evText) : [];
+    const upText = await fetchOptional(FILES.updates);
+    UPDATES = upText ? csvToObjects(upText) : [];
+
+    document.getElementById('site-title').textContent = (CONFIG.title || 'CEA Championship').toUpperCase();
+    document.title = CONFIG.title || 'CEA Championship';
+    document.getElementById('load-time').textContent = new Date().toLocaleString('en-GB', { hour12: false });
+    if (CONFIG.repo_url) document.getElementById('repo-link').href = CONFIG.repo_url;
+
+    renderSeasonProgress();
+    renderUpdate();
+    renderPodium();
+    renderNextEvent();
+    renderOnTheClock();
+    renderLeaderboard();
+    renderDetails();
+    renderSchedule();
+    renderRules();
+    attachTabs();
+
+    curtain.classList.add('hidden');
+    setTimeout(() => { curtain.style.display = 'none'; }, 350);
+  } catch (err) {
+    console.error(err);
+    curtain.classList.add('error');
+    msg.textContent = 'Could not load scoreboard data.';
+    detail.textContent = `${err.message}\n\nCheck that these files exist at the site root:\n  data/config.json\n  data/categories.csv\n  data/scores.csv\n\nOn GitHub Pages the URL is case-sensitive.`;
+  }
+}
+
+function renderSeasonProgress() {
+  const start = CONFIG.season_start, end = CONFIG.season_end;
+  if (!start || !end) return;
+  const today = todayISO();
+  const total = daysBetween(start, end);
+  const elapsed = Math.max(0, Math.min(total, daysBetween(start, today)));
+  const pct = total > 0 ? (elapsed / total) * 100 : 0;
+  document.getElementById('season-progress-bar').style.width = pct + '%';
+  document.getElementById('season-progress-detail').textContent = `Day ${elapsed} of ${total} \u00b7 ${Math.max(0, total - elapsed)} to go`;
+}
+
+function renderUpdate() {
+  if (!UPDATES.length) return;
+  const sorted = [...UPDATES].filter(u => u.date).sort((a,b) => b.date.localeCompare(a.date));
+  const latest = sorted[0];
+  if (!latest) return;
+  document.getElementById('update-headline').textContent = latest.headline || '';
+  document.getElementById('update-text').textContent = latest.body || '';
+  document.getElementById('update-date').textContent = fmtDate(latest.date);
+  document.getElementById('update-banner').style.display = 'flex';
+}
+
+function computeAgencyRow(agency) {
+  let earned = 0, totalMax = 0, soFarEarned = 0, soFarMax = 0;
+  const perCat = {};
+  CATEGORIES.forEach(cat => {
+    const raw = agency[cat.id];
+    const val = raw === '' || raw === undefined ? null : parseFloat(raw);
+    const numeric = val === null || isNaN(val) ? 0 : val;
+    totalMax += cat.max_points; earned += numeric;
+    const passed = deadlinePassed(cat.deadline);
+    if (passed) { soFarMax += cat.max_points; soFarEarned += numeric; }
+    perCat[cat.id] = { value: val, max: cat.max_points, pct: cat.max_points > 0 && val !== null ? (numeric / cat.max_points) * 100 : null, passed };
+  });
+  return { agency: agency.agency, earned, totalMax, soFarEarned, soFarMax,
+    pctTotal: totalMax > 0 ? (earned / totalMax) * 100 : 0,
+    pctSoFar: soFarMax > 0 ? (soFarEarned / soFarMax) * 100 : null,
+    perCat };
+}
+function assignRanks(rows, key) {
+  const sorted = [...rows].sort((a,b) => { const av = a[key] === null ? -1 : a[key]; const bv = b[key] === null ? -1 : b[key]; return bv - av; });
+  let cur = 0, last = null, i = 0;
+  sorted.forEach(r => { i++; if (r[key] !== last) { cur = i; last = r[key]; } r.rank = cur; });
+  return sorted;
+}
+
+function renderPodium() {
+  const basis = document.getElementById('pct-basis').value;
+  const rows = SCORES.map(computeAgencyRow);
+  const ranked = assignRanks(rows, basis === 'total' ? 'pctTotal' : 'pctSoFar');
+  const top3 = ranked.slice(0, 3);
+  const c = document.getElementById('podium'); c.innerHTML = '';
+  const labels = ['1st','2nd','3rd'];
+  const trophies = ['\u{1F3C6}','\u{1F948}','\u{1F949}'];
+  top3.forEach((row, idx) => {
+    const rank = idx + 1;
+    const pct = basis === 'total' ? row.pctTotal : row.pctSoFar;
+    const pctDisplay = pct === null ? '\u2014' : `${pct.toFixed(1)}%`;
+    const earned = basis === 'total' ? `${row.earned} / ${row.totalMax} pts` : (row.soFarMax > 0 ? `${row.soFarEarned} / ${row.soFarMax} pts` : `${row.earned} pts`);
+    const slot = document.createElement('div');
+    slot.className = `podium-slot slot-${rank}`;
+    slot.innerHTML = `<div class="medal">${trophies[idx]} ${labels[idx]}</div><div class="podium-agency">${escapeHtml(row.agency)}</div><div class="podium-pts">${earned}</div><div class="podium-pct">${pctDisplay}</div>`;
+    c.appendChild(slot);
+  });
+}
+
+function renderNextEvent() {
+  const today = todayISO();
+  const upcoming = EVENTS.filter(e => e.date && e.date >= today).sort((a,b) => a.date.localeCompare(b.date));
+  if (!upcoming.length) {
+    document.getElementById('next-event-date').textContent = '';
+    document.getElementById('next-event-title').textContent = 'No upcoming events scheduled';
+    document.getElementById('next-event-desc').textContent = 'Add events in data/events.csv to see them here.';
+    return;
+  }
+  const ev = upcoming[0];
+  const days = daysBetween(today, ev.date);
+  const label = days === 0 ? 'TODAY' : (days === 1 ? 'TOMORROW' : `IN ${days} DAYS`);
+  document.getElementById('next-event-date').textContent = `${fmtDate(ev.date)} \u00b7 ${label}`;
+  document.getElementById('next-event-title').textContent = ev.title || '';
+  document.getElementById('next-event-desc').textContent = ev.description || '';
+}
+
+function renderOnTheClock() {
+  const today = todayISO();
+  const upcoming = CATEGORIES.filter(c => c.deadline && c.deadline >= today).map(c => ({...c, days: daysBetween(today, c.deadline)})).filter(c => c.days <= 30).sort((a,b) => a.deadline.localeCompare(b.deadline));
+  const ul = document.getElementById('clock-list'); ul.innerHTML = '';
+  if (!upcoming.length) { ul.innerHTML = '<li class="clock-empty">No deadlines in the next 30 days.</li>'; return; }
+  upcoming.forEach(c => {
+    const label = c.days === 0 ? 'TODAY' : (c.days === 1 ? '1 day' : `${c.days} days`);
+    const urgent = c.days <= 7 ? 'urgent' : '';
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="clock-cat">${escapeHtml(c.short_name || c.name)}</span><span class="clock-days ${urgent}">${label}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+function renderLeaderboard() {
+  const basis = document.getElementById('pct-basis').value;
+  const rows = SCORES.map(computeAgencyRow);
+  const ranked = assignRanks(rows, basis === 'total' ? 'pctTotal' : 'pctSoFar');
+  const tbody = document.querySelector('#leaderboard-table tbody'); tbody.innerHTML = '';
+  ranked.forEach(row => {
+    const pct = basis === 'total' ? row.pctTotal : row.pctSoFar;
+    const pctDisplay = pct === null ? '\u2014' : `${pct.toFixed(1)}%`;
+    const cls = colorClass(pct === null ? 0 : pct, CONFIG.color_thresholds);
+    const earnedDisplay = basis === 'total' ? `${row.earned} / ${row.totalMax}` : (row.soFarMax > 0 ? `${row.soFarEarned} / ${row.soFarMax}` : `${row.earned} / 0`);
+    const rankClass = row.rank <= 3 ? `rank-${row.rank}` : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="col-rank ${rankClass}">${row.rank}</td><td class="col-agency">${escapeHtml(row.agency)}</td><td class="col-total">${earnedDisplay}</td><td class="col-pct">${pctDisplay}</td><td class="col-bar"><div class="bar"><div class="bar-fill ${cls}" style="width:${pct === null ? 0 : Math.min(100, pct)}%"></div></div></td>`;
+    tbody.appendChild(tr);
+    const detailTr = document.createElement('tr'); detailTr.className = 'detail-row';
+    const td = document.createElement('td'); td.colSpan = 5; td.innerHTML = renderDetailPanel(row);
+    detailTr.appendChild(td); tbody.appendChild(detailTr);
+    tr.addEventListener('click', () => {
+      const open = detailTr.classList.contains('visible');
+      document.querySelectorAll('.detail-row.visible').forEach(d => d.classList.remove('visible'));
+      document.querySelectorAll('#leaderboard-table tbody tr.expanded').forEach(d => d.classList.remove('expanded'));
+      if (!open) { detailTr.classList.add('visible'); tr.classList.add('expanded'); }
+    });
+  });
+  renderPodium();
+}
+
+function renderDetailPanel(row) {
+  const groups = {}; CATEGORIES.forEach(cat => { (groups[cat.group] = groups[cat.group] || []).push(cat); });
+  let html = '<div class="detail-groups">';
+  CONFIG.category_groups.forEach(g => {
+    if (!groups[g]) return;
+    html += `<div class="detail-group"><h4>${escapeHtml(g)}</h4><div class="detail-cats">`;
+    groups[g].forEach(cat => {
+      const pc = row.perCat[cat.id];
+      const has = pc.value !== null;
+      const cls = has ? colorClass(pc.pct, CONFIG.color_thresholds) : (pc.passed ? 'red' : 'pending');
+      const pts = has ? `${pc.value} / ${pc.max}` : `\u2014 / ${pc.max}`;
+      const tag = pc.passed ? `<span class="deadline-tag">Due ${fmtDate(cat.deadline)} \u00b7 closed</span>` : `<span class="deadline-tag">Due ${fmtDate(cat.deadline)}</span>`;
+      html += `<div class="detail-cat ${cls}"><div class="cat-name">${escapeHtml(cat.short_name || cat.name)}${tag}</div><div class="cat-pts">${pts}</div></div>`;
+    });
+    html += '</div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderDetails() {
+  const rows = SCORES.map(computeAgencyRow);
+  const ranked = assignRanks(rows, 'pctSoFar');
+  const groupFilter = document.getElementById('group-filter').value;
+  const gf = document.getElementById('group-filter');
+  if (gf.options.length === 1) {
+    CONFIG.category_groups.forEach(g => { const o = document.createElement('option'); o.value = g; o.textContent = g; gf.appendChild(o); });
+    gf.addEventListener('change', renderDetails);
+  }
+  const shownCats = groupFilter ? CATEGORIES.filter(c => c.group === groupFilter) : CATEGORIES;
+  const groupsInOrder = [];
+  CONFIG.category_groups.forEach(g => { const cs = shownCats.filter(c => c.group === g); if (cs.length) groupsInOrder.push({group:g, cats:cs}); });
+  const thead = document.querySelector('#details-table thead'); const tbody = document.querySelector('#details-table tbody');
+  thead.innerHTML = ''; tbody.innerHTML = '';
+  const hr1 = document.createElement('tr');
+  hr1.innerHTML = `<th rowspan="2">Agency</th>`;
+  groupsInOrder.forEach(g => { hr1.innerHTML += `<th class="group-header" colspan="${g.cats.length}">${escapeHtml(g.group)}</th>`; });
+  hr1.innerHTML += `<th rowspan="2">Total</th>`;
+  thead.appendChild(hr1);
+  const hr2 = document.createElement('tr');
+  groupsInOrder.forEach(g => { g.cats.forEach(cat => { hr2.innerHTML += `<th class="cat-col" title="${escapeHtml(cat.name)} \u00b7 Max ${cat.max_points} \u00b7 Due ${fmtDate(cat.deadline)}">${escapeHtml(cat.short_name || cat.name)}</th>`; }); });
+  thead.appendChild(hr2);
+  ranked.forEach(row => {
+    const tr = document.createElement('tr');
+    let html = `<td class="agency-cell">${escapeHtml(row.agency)}</td>`;
+    let totalShown = 0, maxShown = 0;
+    groupsInOrder.forEach(g => { g.cats.forEach(cat => {
+      const pc = row.perCat[cat.id]; const has = pc.value !== null;
+      const cls = has ? colorClass(pc.pct, CONFIG.color_thresholds) : 'pending';
+      const display = has ? pc.value : '\u2014';
+      html += `<td class="score-cell ${cls}" title="${escapeHtml(cat.name)}">${display}</td>`;
+      maxShown += cat.max_points; if (has) totalShown += pc.value;
+    }); });
+    html += `<td class="total-cell">${totalShown} / ${maxShown}</td>`;
+    tr.innerHTML = html; tbody.appendChild(tr);
+  });
+}
+
+function renderSchedule() {
+  const container = document.getElementById('schedule-list'); container.innerHTML = '';
+  if (!EVENTS.length) { container.innerHTML = '<p class="hint">No events yet. Add rows to <code>data/events.csv</code>.</p>'; return; }
+  const today = todayISO();
+  const sorted = [...EVENTS].filter(e => e.date).sort((a,b) => a.date.localeCompare(b.date));
+  const nextIdx = sorted.findIndex(e => e.date >= today);
+  sorted.forEach((e, idx) => {
+    const past = e.date < today; const isNext = idx === nextIdx;
+    const dd = fmtDateShort(e.date); const days = daysBetween(today, e.date);
+    let label = ''; if (past) label = `${Math.abs(days)} days ago`; else if (days === 0) label = 'TODAY'; else if (days === 1) label = 'TOMORROW'; else label = `IN ${days} DAYS`;
+    const div = document.createElement('div');
+    div.className = `schedule-item ${past ? 'past' : ''} ${isNext ? 'next' : ''}`;
+    div.innerHTML = `<div class="schedule-date"><div class="day">${dd.day}</div><div class="month">${dd.month}</div><div class="year">${dd.year}</div></div><div class="schedule-body"><h4>${escapeHtml(e.title || '')}</h4><p>${escapeHtml(e.description || '')}</p></div><div class="schedule-days">${label}</div>`;
+    container.appendChild(div);
+  });
+}
+
+function renderRules() {
+  const c = document.getElementById('rules-content'); c.innerHTML = '';
+  CONFIG.category_groups.forEach(g => {
+    const cats = CATEGORIES.filter(cat => cat.group === g); if (!cats.length) return;
+    const div = document.createElement('div'); div.className = 'rule-group';
+    div.innerHTML = `<h3>${escapeHtml(g)}</h3>`;
+    cats.forEach(cat => {
+      const card = document.createElement('div'); card.className = 'rule-card';
+      card.innerHTML = `<div class="rule-header"><div class="rule-name">${escapeHtml(cat.name)}</div><div class="rule-meta">${cat.max_points} PTS \u00b7 Due ${fmtDate(cat.deadline) || 'TBD'}</div></div><p class="rule-desc">${escapeHtml(cat.description || '')}</p>`;
+      div.appendChild(card);
+    });
+    c.appendChild(div);
+  });
+  const fn = document.getElementById('footnotes-content'); fn.innerHTML = '';
+  Object.entries(CONFIG.footnotes || {}).forEach(([k,v]) => { const p = document.createElement('p'); p.innerHTML = `<strong>${escapeHtml(k)}:</strong> ${escapeHtml(v)}`; fn.appendChild(p); });
+  document.getElementById('total-available').textContent = CATEGORIES.reduce((s,c) => s + c.max_points, 0);
+  document.getElementById('total-cats').textContent = CATEGORIES.length;
+  document.getElementById('total-agencies').textContent = SCORES.length;
+}
+
+function attachTabs() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === tab));
+    });
+  });
+  document.getElementById('pct-basis').addEventListener('change', () => { renderLeaderboard(); renderPodium(); });
+  document.getElementById('print-btn').addEventListener('click', () => window.print());
+}
+
+loadAll();

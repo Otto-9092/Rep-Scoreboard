@@ -1,8 +1,10 @@
 {
-  "title": "CEA Competition Scorecard",
-  "subtitle": "2026\u20132027 Cycle \u00b7 Region 530",
+  "title": "CEA Championship",
+  "subtitle": "2026\u20132027 Season \u00b7 Region 530",
   "region": "530",
   "cycle": "2026-2027",
+  "season_start": "2026-09-04",
+  "season_end": "2027-08-31",
   "color_thresholds": {
     "red_max": 50,
     "yellow_max": 75
@@ -17,5 +19,6 @@
   "footnotes": {
     "RC (Commercial)": "RC is the stage of \"new\" products in the Pioneer pipeline. If something is R4-R6 it is probably in an Impact Plot. RC = Commercial.",
     "Crop Condition Tour scoring": "Record 10 Crop Condition / Yield Estimation notes in Granular and fill out the MS Forms sheet. 5 pts per entry, max 50 pts."
-  }
+  },
+  "repo_url": "https://github.com/otto-9092/Rep-Scoreboard"
 }
