@@ -1,21 +1,22 @@
 id,name,short_name,max_points,group,deadline,description
-pk_session,Attend PK Session 9/4/26,PK Session (9/4/26),5,Training & PK,2026-09-04,"1 pt for attendance + 4 pts for bringing the PK book. Held 9/4/2026."
-harvest_data,Gather Harvest Data,Harvest Data,25,Data & Reporting,2026-12-31,"1 pt per 20 acres of harvest data gathered. Rolls through fall harvest."
-dp_meeting,Attend 2027 DP Meeting,DP Meeting,30,Training & PK,2027-02-28,"Attend the 2027 District Planning meeting. 30 pts flat."
-vitality_index,Complete Vitality Index & Profiled Acres,Vitality Index,25,Planning & Admin,2027-03-01,"Complete Vitality Index and Profiled Acres by 3/1/2027."
-self_eval,Complete Agency Self-Evaluation Form,Self-Evaluation,20,Planning & Admin,2027-03-01,"Complete the Agency Self-Evaluation Form by 3/1/2027."
-field_planning,Field Planning,Field Planning,15,Planning & Admin,2027-03-31,"50% of invoiced customers planned by 3/31/2027."
-customer_meeting,Hold Customer Meeting (1/1 - 3/31),Customer Meeting,25,Customer Engagement,2027-03-31,"Hold at least one customer meeting between 1/1/2027 and 3/31/2027."
-agronomic_focus,Customer Meeting Has Agronomic Focus,Agronomic Focus,25,Customer Engagement,2027-03-31,"The customer meeting above must include an agronomic focus segment."
-owners_manual,"Fill out an Owner's Manual for customers",Owner's Manual,100,Customer Engagement,2027-06-30,"20 pts each, max of 100 pts (5 manuals). Source spreadsheet header said 'Max of 50' but totals row showed 100. Using 100 -- edit if wrong."
-water_reporter,Enroll into Water Reporter,Water Reporter,50,Customer Engagement,2027-06-30,"Enroll 1,000 acres into Water Reporter OR sign up 3 new farms/operations."
-pk_session_fall,PK Session (Fall 2026),PK Session (Fall),5,Training & PK,2026-12-31,"Fall PK Session -- rename with actual date once scheduled. 1 pt attendance + 4 pts for bringing PK book."
-pk_session_winter,PK Session (Winter 2027),PK Session (Winter),5,Training & PK,2027-03-31,"Winter/Spring PK Session -- rename with actual date once scheduled. 1 pt attendance + 4 pts for bringing PK book."
-plots_all,All Plots Submitted in mTDE & Granular,All Plots,10,Data & Reporting,2027-07-01,"All plots submitted in mTDE & Granular note by 7/1/2027."
-plots_rc_sxs,All RC & SxS Plots in mTDE & Granular,RC/SxS Plots,10,Data & Reporting,2027-06-15,"All RC (Commercial-stage) and SxS plots submitted by 6/15/2027."
-plots_comp_corn,3 Competitive Corn SxS Plots,Comp Corn SxS,10,Data & Reporting,2027-06-15,"3 competitive corn SxS plots in mTDE & Granular note by 6/15/2027."
-as_planted,Enter As Planted Data into Granular,As Planted,25,Data & Reporting,2027-07-15,"Enter As Planted data into Granular by 7/15/2027. Minimum 250 acres to qualify."
-launch_2028,Attend Launch for 2028 Sales Year,Launch 2028,10,Training & PK,2027-08-31,"Attend Launch for the 2028 Sales Year. Minimum 1 per agency."
-rep_reward,Rep Reward Qualifier,Rep Reward,60,Rep Recognition,2027-08-31,"Each category qualified = 10 pts, max of 60 pts (6 categories)."
-crop_condition_tour,Participate in 2027 Pioneer Crop Condition Tour,Crop Condition Tour,50,Data & Reporting,2027-08-31,"Participate in the 2027 Pioneer Crop Condition Tour. Record 10 Crop Condition / Yield Estimation notes in Granular and fill out the MS Forms sheet, 5 pts/entry, max 50 pts."
-summer_event,Hold at least one Pioneer Event in Summer 2027,Summer Event,25,Customer Engagement,2027-08-31,"Hold at least one Pioneer Event during Summer 2027."
+pk_session,Attend PK Session 9/4/26,PK Session (9/4/26),5,Training & PK,2026-09-04,"Held 9/4/2026. 1 pt for attendance, 4 pts for bringing the PK book (5 pts total)."
+harvest_data,Gather Harvest Data,Harvest Data,40,Data & Reporting,2026-12-31,"Harvest data must be entered into Granular. 1 pt per 20 acres up to 25 pts (500 acres = 25 pts). BONUS: 1,500+ acres of harvest data submitted = additional 15 pts. Max 40 pts."
+dp_meeting,Attend 2027 DP Meeting,DP Meeting,30,Training & PK,2027-01-31,Attend the 2027 District Planning meeting. 30 pts flat just for showing up -- it's a big one. PLACEHOLDER DEADLINE: update when scheduled.
+vitality_index,Complete Vitality Index,Vitality Index,25,Planning & Admin,2027-03-01,Complete the Vitality Index by 3/1/2027. 25 pts flat.
+profiled_acres,Complete Profiled Acres,Profiled Acres,25,Planning & Admin,2027-03-01,Complete Profiled Acres by 3/1/2027. 25 pts flat. (Separate deliverable from the Vitality Index.)
+self_eval,Complete Agency Self-Evaluation Form,Self-Evaluation,20,Planning & Admin,2027-03-01,Complete the 2027 Agency Self-Evaluation Form by 3/1/2027. New form for the 2027 cycle -- link/details TBD.
+field_planning,Field Planning,Field Planning,15,Planning & Admin,2027-04-15,50% of invoiced customers must be FULLY PLANNED in Granular Insights by the deadline. Partial or draft plans do not count.
+customer_meeting,Hold Customer Meeting (1/1 - 3/31),Customer Meeting,25,Customer Engagement,2027-03-31,"Hold at least one set-up customer meeting between 1/1 and 3/31/2027. Size doesn't matter, but it must be a PLANNED meeting -- impromptu conversations don't count."
+agronomic_focus,Customer Meeting Has Agronomic Focus,Agronomic Focus,25,Customer Engagement,2027-03-31,The set-up customer meeting above must include agronomic focus: at least 15 minutes on each of 2 different agronomy topics.
+owners_manual,Fill out an Owner's Manual for customers,Owner's Manual,100,Customer Engagement,2027-04-15,"20 pts each, max of 100 pts (5 manuals). NOTE: source spreadsheet header said 'Max of 50' but totals row showed 100 -- confirm intended cap."
+water_reporter,Enroll into Water Reporter,Water Reporter,50,Customer Engagement,2027-06-30,"Enroll 1,000 acres into Water Reporter = automatic 50 pts. For agencies under 1,000 acres, scaled by grower count: 1 grower = 15 pts, 2 growers = 30 pts, 3+ growers = 50 pts."
+pk_session_fall,PK Session (Fall 2026),PK Session (Fall),5,Training & PK,2026-12-31,"Fall 2026 PK Session -- rename with actual date once scheduled. 1 pt for attendance, 4 pts for bringing the PK book. PLACEHOLDER DEADLINE."
+pk_session_winter,PK Session (Winter 2027),PK Session (Winter),5,Training & PK,2027-03-31,"Winter/Spring 2027 PK Session -- rename with actual date once scheduled. 1 pt for attendance, 4 pts for bringing the PK book. PLACEHOLDER DEADLINE."
+plots_all,All Plots Submitted in mTDE & Granular,All Plots,10,Data & Reporting,2027-07-01,All plots submitted in mTDE & Granular by 7/1/2027.
+plots_rc_sxs,All RC & SxS Plots in mTDE & Granular,RC/SxS Plots,10,Data & Reporting,2027-06-15,All RC (Commercial-stage) and SxS plots submitted in mTDE & Granular by 6/15/2027.
+plots_comp_corn,3 Competitive Corn SxS Plots,Comp Corn SxS,10,Data & Reporting,2027-06-15,3 competitive corn SxS plots submitted in mTDE & Granular by 6/15/2027.
+as_planted,Enter As Planted Data into Granular,As Planted,40,Data & Reporting,2027-07-15,"Enter As Planted data into Granular by 7/15/2027. 250 acres minimum = 25 pts. Under 250 acres = 0 pts. BONUS: 1,500+ acres of As Planted data = additional 15 pts. Max 40 pts."
+launch_2028,Attend Launch for 2028 Sales Year,Launch 2028,10,Training & PK,2027-07-31,Attend Launch for the 2028 Sales Year. Minimum 1 rep per agency = 10 pts. PLACEHOLDER DEADLINE.
+rep_reward,Rep Reward Qualifier,Rep Reward,60,Rep Recognition,2027-08-31,"Tracked by Pioneer Corporate as a separate program. 10 pts per qualifying category, max 60 pts (6 categories). Specific categories TBD -- Mike to provide."
+crop_condition_tour,Participate in 2027 Pioneer Crop Condition Tour,Crop Condition Tour,50,Data & Reporting,2027-08-31,Participate in the 2027 Pioneer Crop Condition Tour. Record 5+ field notes = full 50 pts. Fewer than 5 notes = 0 pts. More specifics to come after the 2026 tour wraps.
+summer_event,Hold at least one Pioneer Event in Summer 2027,Summer Event,25,Customer Engagement,2027-08-31,Hold at least one Pioneer Event in Summer 2027. Qualifies: field day OR customer appreciation event.

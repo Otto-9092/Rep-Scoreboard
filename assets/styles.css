@@ -34,7 +34,7 @@ body { margin: 0; font-family: var(--font-body); background: var(--bg); color: v
 .pioneer-header { background: white; border-bottom: 5px solid var(--pioneer-green); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .header-inner { max-width: 1300px; margin: 0 auto; padding: 1.25rem 1.5rem; display: grid; grid-template-columns: auto 1fr auto; gap: 1.5rem; align-items: center; }
 .brand { display: flex; align-items: center; }
-.pioneer-logo img { height: 64px; width: auto; display: block; }
+.pioneer-logo img { height: 72px; width: auto; display: block; }
 .pioneer-wordmark { font-family: var(--font-display); font-weight: 900; font-size: 2rem; color: var(--pioneer-green); letter-spacing: 0.03em; line-height: 1; }
 .title-block { text-align: left; border-left: 4px solid var(--pioneer-amber); padding-left: 1.25rem; }
 .kicker { font-family: var(--font-body); font-size: 0.75rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; margin-bottom: 0.15rem; }
