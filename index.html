@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CEA Competition Scorecard</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <h1 id="site-title">CEA Competition Scorecard</h1>
+    <p id="site-subtitle" class="subtitle">Loading&hellip;</p>
+  </div>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="leaderboard">Leaderboard</button>
+    <button class="tab-btn" data-tab="details">Details</button>
+    <button class="tab-btn" data-tab="rules">Rules &amp; Definitions</button>
+  </nav>
+</header>
+<main>
+  <section id="leaderboard" class="tab-panel active">
+    <div class="controls">
+      <label class="pct-toggle">
+        <span>Show % against:</span>
+        <select id="pct-basis">
+          <option value="total">Total Available (530)</option>
+          <option value="so_far" selected>Available So Far</option>
+        </select>
+      </label>
+      <button id="print-btn" class="btn-secondary">Print View</button>
+    </div>
+    <div class="table-wrap">
+      <table id="leaderboard-table">
+        <thead>
+          <tr>
+            <th class="col-rank">Rank</th>
+            <th class="col-agency">Agency</th>
+            <th class="col-total">Points</th>
+            <th class="col-pct">%</th>
+            <th class="col-bar"></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="hint">Tap or click a row to see per-category detail.</p>
+  </section>
+  <section id="details" class="tab-panel">
+    <div class="controls">
+      <label>
+        <span>Filter by group:</span>
+        <select id="group-filter"><option value="">All groups</option></select>
+      </label>
+    </div>
+    <div class="table-wrap details-wrap">
+      <table id="details-table">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+  <section id="rules" class="tab-panel">
+    <h2>Category Rules &amp; Definitions</h2>
+    <p class="hint">Definitions come from <code>data/categories.csv</code>. Edit that file in GitHub to change wording, add categories, or fix descriptions.</p>
+    <div id="rules-content"></div>
+    <h2>Footnotes</h2>
+    <div id="footnotes-content"></div>
+    <h2>How Scoring Works</h2>
+    <ul>
+      <li><strong>Total points available:</strong> <span id="total-available"></span></li>
+      <li><strong>Total agencies:</strong> <span id="total-agencies"></span></li>
+      <li><strong>Color thresholds:</strong> <span class="chip red">0&ndash;50%</span> <span class="chip yellow">51&ndash;75%</span> <span class="chip green">76&ndash;100%</span></li>
+      <li><strong>"Available So Far"</strong> counts only categories whose deadline has passed as of today. Categories still open are excluded from both the earned and possible sides of the calculation.</li>
+      <li><strong>Ties:</strong> tied agencies share the same rank number; the next agency skips ahead (standard "1224" ranking).</li>
+    </ul>
+  </section>
+</main>
+<footer>
+  <p>Region 530 &middot; Data last loaded <span id="load-time"></span> &middot; <a href="https://github.com/YOUR-USERNAME/cea-scoreboard" target="_blank" rel="noopener">Edit on GitHub</a></p>
+</footer>
+<script src="assets/app.js"></script>
+</body>
+</html>
