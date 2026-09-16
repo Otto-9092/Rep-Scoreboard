@@ -1,5 +1,6 @@
 id,name,short_name,max_points,group,deadline,description
 pk_session,Attend PK Session 9/4/26,PK Session (9/4/26),5,Training & PK,2026-09-04,"Held 9/4/2026. 1 pt for attendance, 4 pts for bringing the PK book (5 pts total)."
+early_order,Early Season Order Confirmation,Early Order Confirmation,25,Customer Engagement,2026-09-15,Confirm early season orders with customers. 25 pts flat -- either completed or not.
 harvest_data,Gather Harvest Data,Harvest Data,40,Data & Reporting,2026-12-31,"Harvest data must be entered into Granular. 1 pt per 20 acres up to 25 pts (500 acres = 25 pts). BONUS: 1,500+ acres of harvest data submitted = additional 15 pts. Max 40 pts."
 dp_meeting,Attend 2027 DP Meeting,DP Meeting,30,Training & PK,2027-01-31,Attend the 2027 District Planning meeting. 30 pts flat just for showing up -- it's a big one. PLACEHOLDER DEADLINE: update when scheduled.
 vitality_index,Complete Vitality Index,Vitality Index,25,Planning & Admin,2027-03-01,Complete the Vitality Index by 3/1/2027. 25 pts flat.
